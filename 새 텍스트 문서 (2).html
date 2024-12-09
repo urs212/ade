@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영상 및 광고</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #skip-button {
+            display: none;
+            background-color: #ff0000;
+            color: white;
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        #advertisement {
+            display: none;
+            margin-top: 20px;
+        }
+        #video-container {
+            max-width: 80%;
+            max-height: 80%;
+            margin: 0 auto;
+        }
+        iframe {
+            width: 100%;
+            height: 450px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>첫 번째 영상 시작</h1>
+
+    <!-- 첫 번째 YouTube 비디오 -->
+    <div id="video-container">
+        <iframe id="first-video" src="https://www.youtube.com/embed/rNZmdv08FPI?autoplay=1&enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <!-- 광고 -->
+    <div id="advertisement">
+        <h2>광고입니다! 10초 후에 건너뛰기 버튼이 나타납니다.</h2>
+        <iframe id="advertisement-video" src="https://www.youtube.com/embed/rO5HYXFbYJo?autoplay=1&enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <!-- 건너뛰기 버튼 -->
+        <button id="skip-button" onclick="skipAd()">광고 건너뛰기</button>
+    </div>
+
+    <!-- 두 번째 YouTube 비디오 -->
+    <div id="youtube-video" style="display:none;">
+        <h2>다음 영상</h2>
+        <iframe id="second-video" src="https://www.youtube.com/embed/y6LijsxM2bc?autoplay=1&enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        const skipButton = document.getElementById('skip-button');
+        const advertisement = document.getElementById('advertisement');
+        const youtubeVideo = document.getElementById('youtube-video');
+        const firstVideo = document.getElementById('first-video');
+        const advertisementVideo = document.getElementById('advertisement-video');
+
+        // 첫 번째 영상이 끝나면 광고 표시
+        function onFirstVideoEnd() {
+            // 첫 번째 영상 숨기기
+            firstVideo.style.display = 'none';
+            advertisement.style.display = 'block'; // 광고 비디오 보여주기
+            setTimeout(function() {
+                skipButton.style.display = 'block'; // 10초 후 건너뛰기 버튼 표시
+            }, 10000); // 10초 후 건너뛰기 버튼 표시
+        }
+
+        // 광고 건너뛰기 버튼 클릭 시
+        function skipAd() {
+            advertisement.style.display = 'none'; // 광고 숨기기
+            skipButton.style.display = 'none'; // 건너뛰기 버튼 숨기기
+            youtubeVideo.style.display = 'block'; // 두 번째 영상 표시
+        }
+
+        // YouTube API 로드 및 영상 종료 이벤트 처리
+        function onYouTubeIframeAPIReady() {
+            const player = new YT.Player('first-video', {
+                events: {
+                    'onStateChange': function(event) {
+                        if (event.data === YT.PlayerState.ENDED) {
+                            onFirstVideoEnd();
+                        }
+                    }
+                }
+            });
+            const adPlayer = new YT.Player('advertisement-video', {
+                events: {
+                    'onStateChange': function(event) {
+                        if (event.data === YT.PlayerState.ENDED) {
+                            skipAd(); // 광고 끝나면 자동으로 건너뛰기
+                        }
+                    }
+                }
+            });
+        }
+
+        // YouTube API 로드
+        const script = document.createElement('script');
+        script.src = "https://www.youtube.com/iframe_api";
+        document.body.appendChild(script);
+    </script>
+
+</body>
+</html>
